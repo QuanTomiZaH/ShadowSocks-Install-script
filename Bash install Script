@@ -1,0 +1,27 @@
+#!/bin/bash
+#chmod u+x <textfile>
+#use the above command to give the textfile permission to be run
+
+
+#This one can be evoked regardless of the machine is up to date, it does not take too long
+echo "Getting updates for this machine"
+sudo apt-get update
+
+
+#checking if python-pip is installed, if not then install it
+echo "checking if this machine requires python-pip "
+sudo apt-get install python-pip <<-EOF
+y
+EOF
+pip install --upgrade pip
+
+echo "installing shadowsocks"
+pip install shadowsocks
+
+#Installing cryptobox for security and speed
+apt-get install python-m2crypto
+apt-get install build-essential
+wget https://github.com/jedisct1/libsodium/releases/download/1.0.10/libsodium-1.0.10.tar.gz
+tar xf libsodium-1.0.10.tar.gz && cd libsodium-1.0.10
+./configure && make && make install
+ldconfig
