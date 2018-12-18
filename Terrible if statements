@@ -1,0 +1,18 @@
+#!/bin/bash
+
+if hash shadowsocks 2>/dev/null; then
+	echo "This machine does not requires shadowsocks updates"
+else
+	echo "This machine requires shadowsocks updates"
+fi
+
+echo "checking if this machine requires python-pip "
+if hash python-pip 2>/dev/null; then
+	echo "This machine already has python-pip installed"
+else
+	echo "This machine requires python-pip"
+	sudo apt-get install python-pip <<-EOF
+	y
+	EOF
+	pip install --upgrade
+fi
