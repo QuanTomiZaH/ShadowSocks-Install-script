@@ -3,14 +3,13 @@
 #use the above command to give the textfile permission to be run
 
 
-#This one can be evoked regardless of the machine is up to date, it does not take too long
+#Update the machine just in case
 echo "Getting updates for this machine"
-sudo apt-get update
+apt-get update
 
-
-#checking if python-pip is installed, if not then install it
+#Install python.pip for Shadowsocks
 echo "checking if this machine requires python-pip "
-sudo apt-get install python-pip <<-EOF
+apt-get install python-pip <<-EOF
 y
 EOF
 pip install --upgrade pip
@@ -25,3 +24,36 @@ wget https://github.com/jedisct1/libsodium/releases/download/1.0.10/libsodium-1.
 tar xf libsodium-1.0.10.tar.gz && cd libsodium-1.0.10
 ./configure && make && make install
 ldconfig
+
+#Een variabele definiëren om de private IP te vinden, deze wordt in het config file.json toegevoegd zodat er verbinding kan worden gemaakt
+private_ip=$(ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')
+echo $private_ip
+
+#deze cd weghalen wanneer hij in het echte script komt
+cd
+
+cd /etc
+
+#Een nieuw textbestand aanmaken voor de config van Shadowsocks
+config_file_shadowsocks="Shadowsocks.json"
+if [ -e $config_file_shadowsocks ]; then
+	echo "file" + $config_file_shadowsocks + " already exists!"
+else
+	#Text naar het textbestand schrijven | Hier de verschillende gegevens inzetten als die nodig zijn(poorten en wachtwoorden)
+	echo '{' >> $config_file_shadowsocks
+	echo '    "server":"'$private_ip'",' >> $config_file_shadowsocks
+	echo '     "server_port":8000,' >> $config_file_shadowsocks
+	echo '     "local_port":1080,' >> $config_file_shadowsocks
+	echo '     "password":"Password123",' >> $config_file_shadowsocks
+	echo '     "timeout":600,' >> $config_file_shadowsocks #Dit is 10 minuten geen reactie dan zet hij de verbinding uit
+	echo '     "method":"chacha20"' >> $config_file_shadowsocks
+	echo '}' >> $config_file_shadowsocks
+fi
+
+#give the file permission to be ran
+chmod u+x $config_file_shadowsocks
+
+sed -i "14i /usr/bin/python /usr/local/bin/ssserver -c /etc/shadowsocks.json -d start" rc.local
+sed -i "13d" rc.local
+
+cd
