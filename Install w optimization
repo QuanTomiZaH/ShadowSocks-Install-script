@@ -1,0 +1,108 @@
+#!/bin/bash
+#chmod u+x <textfile>
+#use the above command to give the textfile permission to be run
+
+
+#Update the machine just in case
+echo "Getting updates for this machine"
+apt-get update
+
+#Install python.pip for Shadowsocks
+echo "checking if this machine requires python-pip "
+apt-get install python-pip <<-EOF
+y
+EOF
+pip install --upgrade pip
+
+echo "installing shadowsocks"
+pip install shadowsocks
+
+#Installing cryptobox for security and speed
+apt-get install python-m2crypto
+apt-get install build-essential
+wget https://github.com/jedisct1/libsodium/releases/download/1.0.10/libsodium-1.0.10.tar.gz
+tar xf libsodium-1.0.10.tar.gz && cd libsodium-1.0.10
+./configure && make && make install
+ldconfig
+
+#Een variabele definiëren om de private IP te vinden, deze wordt in het config file.json toegevoegd zodat er verbinding kan worden gemaakt
+private_ip=$(ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')
+echo $private_ip
+
+#Deze cd weghalen wanneer hij in het echte script komt
+cd
+
+cd /etc
+echo "Creating Config file"
+#Een nieuw textbestand aanmaken voor de config van Shadowsocks
+config_file_shadowsocks="Shadowsocks.json"
+if [ -e $config_file_shadowsocks ]; then
+	echo "file" + $config_file_shadowsocks + " already exists!"
+else
+	#Text naar het textbestand schrijven | Hier de verschillende gegevens inzetten als die nodig zijn(poorten en wachtwoorden)
+	echo '{' >> $config_file_shadowsocks
+	echo '     "server":"'$private_ip'",' >> $config_file_shadowsocks
+	echo '     "port_password": {' >> $config_file_shadowsocks #wachtoorden hier veranderen voor de verschillende apparaten
+	echo '        "8381": "password1",' >> $config_file_shadowsocks 
+	echo '        "8382": "password2",' >> $config_file_shadowsocks
+	echo '        "8383": "password3",' >> $config_file_shadowsocks
+	echo '        "8384": "password4",' >> $config_file_shadowsocks
+	echo '        "8385": "password5",' >> $config_file_shadowsocks
+	echo '        "8386": "password6",' >> $config_file_shadowsocks
+	echo '    },' >> $config_file_shadowsocks
+	echo '     "local_port":1080,' >> $config_file_shadowsocks
+	echo '     "timeout":600,' >> $config_file_shadowsocks #Dit is 10 minuten geen reactie dan zet hij de verbinding uit
+	echo '     "method":"chacha20"' >> $config_file_shadowsocks
+	echo '}' >> $config_file_shadowsocks
+fi
+
+#give the file permission to be ran
+chmod u+x $config_file_shadowsocks
+
+#starting the shadowsocks server
+ssserver -c /etc/shadowsocks.json -d start
+
+#Adding to the config file so the server starts everytime after
+sed -i "14i /usr/bin/python /usr/local/bin/ssserver -c /etc/shadowsocks.json -d start" rc.local
+sed -i "13d" rc.local
+
+#navigate to the correct path
+cd /etc/security
+
+echo '* soft nofile 51200' >> limits.conf
+echo '* hard nofile 51200' >> limits.conf
+
+ssserver -c /etc/shadowsocks.json -d stop
+
+ulimit -n 51200
+
+cd /etc
+
+echo 'fs.file-max = 51200' >> sysctl.conf
+echo ''
+echo 'net.core.rmem_max = 67108864' >> sysctl.conf
+echo 'net.core.wmem_max = 67108864' >> sysctl.conf
+echo 'net.core.netdev_max_backlog = 250000' >> sysctl.conf
+echo 'net.core.somaxconn = 4096' >> sysctl.conf
+echo ''
+echo 'net.ipv4.tcp_syncookies = 1' >> sysctl.conf
+echo 'net.ipv4.tcp_tw_reuse = 1' >> sysctl.conf
+echo 'net.ipv4.tcp_tw_recycle = 0' >> sysctl.conf
+echo 'net.ipv4.tcp_fin_timeout = 30' >> sysctl.conf
+echo 'net.ipv4.tcp_keepalive_time = 1200' >> sysctl.conf
+echo 'net.ipv4.ip_local_port_range = 10000 65000' >> sysctl.conf
+echo 'net.ipv4.tcp_max_syn_backlog = 8192' >> sysctl.conf
+echo 'net.ipv4.tcp_max_tw_buckets = 5000' >> sysctl.conf
+echo 'net.ipv4.tcp_fastopen = 3' >> sysctl.conf
+echo 'net.ipv4.tcp_mem = 25600 51200 102400' >> sysctl.conf
+echo 'net.ipv4.tcp_rmem = 4096 87380 67108864' >> sysctl.conf
+echo 'net.ipv4.tcp_wmem = 4096 65536 67108864' >> sysctl.conf
+echo 'net.ipv4.tcp_mtu_probing = 1' >> sysctl.conf
+echo 'net.ipv4.tcp_congestion_control = hybla' >> sysctl.conf
+
+sysctl -p
+ssserver -c /etc/shadowsocks.json -d start
+
+cd
+
+
