@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 #chmod u+x <textfile>
 #use the above command to give the textfile permission to be run
 
