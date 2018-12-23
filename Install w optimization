@@ -71,10 +71,12 @@ cd /etc
 chmod u+x sysctl.conf
 
 echo 'fs.file-max = 51200' >> sysctl.conf
+echo '' >> sysctl.conf
 echo 'net.core.rmem_max = 67108864' >> sysctl.conf
 echo 'net.core.wmem_max = 67108864' >> sysctl.conf
 echo 'net.core.netdev_max_backlog = 250000' >> sysctl.conf
 echo 'net.core.somaxconn = 4096' >> sysctl.conf
+echo '' >> sysctl.conf
 echo 'net.ipv4.tcp_syncookies = 1' >> sysctl.conf
 echo 'net.ipv4.tcp_tw_reuse = 1' >> sysctl.conf
 echo 'net.ipv4.tcp_tw_recycle = 0' >> sysctl.conf
