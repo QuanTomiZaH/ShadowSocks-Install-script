@@ -30,28 +30,18 @@ private_ip=$(ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | a
 echo $private_ip
 
 cd /etc
-
+echo "Creating Config file"
 #Een nieuw textbestand aanmaken voor de config van Shadowsocks
-config_file_shadowsocks="Shadowsocks.json"
+config_file_shadowsocks="shadowsocks.json"
 if [ -e $config_file_shadowsocks ]; then
     echo "file" + $config_file_shadowsocks + " already exists!"
 else
     #Text naar het textbestand schrijven | Hier de verschillende gegevens inzetten als die nodig zijn(poorten en wachtwoorden)
     echo '{' >> $config_file_shadowsocks
     echo '     "server":"'$private_ip'",' >> $config_file_shadowsocks
-    echo '     "port_password": {' >> $config_file_shadowsocks #wachtoorden hier veranderen voor de verschillende apparaten
-    echo '        "8381": "password1",' >> $config_file_shadowsocks 
-    echo '        "8382": "password2",' >> $config_file_shadowsocks
-    echo '        "8383": "password3",' >> $config_file_shadowsocks
-    echo '        "8384": "password4",' >> $config_file_shadowsocks
-    echo '        "8385": "password5",' >> $config_file_shadowsocks
-    echo '        "8386": "password6",' >> $config_file_shadowsocks
-    echo '    },' >> $config_file_shadowsocks
+    echo '     "server_port":8000,' >> $config_file_shadowsocks
     echo '     "local_port":1080,' >> $config_file_shadowsocks
-    echo '     "password":"Password123",' >> $config_file_shadowsocks
-    echo '     "timeout":600,' >> $config_file_shadowsocks #Dit is 10 minuten geen reactie dan zet hij de verbinding uit
-    echo '     "method":"chacha20"' >> $config_file_shadowsocks
-    echo '}' >> $config_file_shadowsocks
+    echo '     "password":"Password1",' >> $config_file_shadowsocks
 fi
 
 #give the file permission to be ran
