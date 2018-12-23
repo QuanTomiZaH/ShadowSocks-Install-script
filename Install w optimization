@@ -57,16 +57,15 @@ chmod u+x $config_file_shadowsocks
 sed -i "14i /usr/bin/python /usr/local/bin/ssserver -c /etc/shadowsocks.json -d start" rc.local
 
 cd
-
+#controleer of de server werkt
 ssserver -c /etc/shadowsocks.json -d start
+ssserver -c /etc/shadowsocks.json -d stop
 
 #Navigate to the correct path
 cd /etc/security
 
 echo '* soft nofile 51200' >> limits.conf
 echo '* hard nofile 51200' >> limits.conf
-
-ssserver -c /etc/shadowsocks.json -d stop
 
 ulimit -n 51200
 
@@ -95,8 +94,8 @@ echo 'net.ipv4.tcp_mtu_probing = 1' >> sysctl.conf
 echo 'net.ipv4.tcp_congestion_control = hybla' >> sysctl.conf
 
 sysctl -p
-ssserver -c /etc/shadowsocks.json -d start
 
 cd
 
+ssserver -c /etc/shadowsocks.json -d start
 
