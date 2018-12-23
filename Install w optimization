@@ -1,7 +1,4 @@
 #!/bin/bash
-#chmod u+x <textfile>
-#use the above command to give the textfile permission to be run
-
 
 #Update the machine just in case
 echo "Getting updates for this machine"
@@ -66,7 +63,7 @@ ssserver -c /etc/shadowsocks.json -d start
 sed -i "14i /usr/bin/python /usr/local/bin/ssserver -c /etc/shadowsocks.json -d start" rc.local
 sed -i "13d" rc.local
 
-#navigate to the correct path
+#Navigate to the correct path
 cd /etc/security
 
 echo '* soft nofile 51200' >> limits.conf
@@ -79,12 +76,12 @@ ulimit -n 51200
 cd /etc
 
 echo 'fs.file-max = 51200' >> sysctl.conf
-echo ''
+echo '' >> sysctl.conf
 echo 'net.core.rmem_max = 67108864' >> sysctl.conf
 echo 'net.core.wmem_max = 67108864' >> sysctl.conf
 echo 'net.core.netdev_max_backlog = 250000' >> sysctl.conf
 echo 'net.core.somaxconn = 4096' >> sysctl.conf
-echo ''
+echo '' >> sysctl.conf
 echo 'net.ipv4.tcp_syncookies = 1' >> sysctl.conf
 echo 'net.ipv4.tcp_tw_reuse = 1' >> sysctl.conf
 echo 'net.ipv4.tcp_tw_recycle = 0' >> sysctl.conf
