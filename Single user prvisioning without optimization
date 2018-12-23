@@ -29,9 +29,6 @@ ldconfig
 private_ip=$(ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')
 echo $private_ip
 
-#Deze cd weghalen wanneer hij in het echte script komt
-cd
-
 cd /etc
 
 #Een nieuw textbestand aanmaken voor de config van Shadowsocks
