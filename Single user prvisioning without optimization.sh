@@ -12,7 +12,6 @@ echo "checking if this machine requires python-pip "
 apt-get install python-pip <<-EOF
 y
 EOF
-pip install --upgrade pip
 
 echo "installing shadowsocks"
 pip install shadowsocks
@@ -48,8 +47,6 @@ fi
 
 #give the file permission to be ran
 chmod u+x $config_file_shadowsocks
-
-cd /etc
 
 sed -i "14i /usr/bin/python /usr/local/bin/ssserver -c /etc/shadowsocks.json -d start" rc.local
 
