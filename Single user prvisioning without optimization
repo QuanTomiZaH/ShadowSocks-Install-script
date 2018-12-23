@@ -42,6 +42,8 @@ else
     echo '     "server_port":8000,' >> $config_file_shadowsocks
     echo '     "local_port":1080,' >> $config_file_shadowsocks
     echo '     "password":"Password1",' >> $config_file_shadowsocks
+    echo '    "timeout":600,' >> $config_file_shadowsocks
+    echo '    "method":"chacha20"' >> $config_file_shadowsocks
 fi
 
 #give the file permission to be ran
