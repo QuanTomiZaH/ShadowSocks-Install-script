@@ -32,7 +32,7 @@ cd
 cd /etc
 echo "Creating Config file"
 #Een nieuw textbestand aanmaken voor de config van Shadowsocks
-config_file_shadowsocks="Shadowsocks.json"
+config_file_shadowsocks="shadowsocks.json"
 if [ -e $config_file_shadowsocks ]; then
 	echo "file" + $config_file_shadowsocks + " already exists!"
 else
