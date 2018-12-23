@@ -43,7 +43,7 @@ else
 	echo '        "8383": "password3",' >> $config_file_shadowsocks
 	echo '        "8384": "password4",' >> $config_file_shadowsocks
 	echo '        "8385": "password5",' >> $config_file_shadowsocks
-	echo '        "8386": "password6",' >> $config_file_shadowsocks
+	echo '        "8386": "password6"' >> $config_file_shadowsocks
 	echo '    },' >> $config_file_shadowsocks
 	echo '     "local_port":1080,' >> $config_file_shadowsocks
 	echo '     "timeout":600,' >> $config_file_shadowsocks #Dit is 10 minuten geen reactie dan zet hij de verbinding uit
