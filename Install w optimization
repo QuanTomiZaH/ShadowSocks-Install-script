@@ -1,4 +1,6 @@
-#!/bin/bash
+#!/usr/bin/env bash
+#rin with:
+#wget -O - https://raw.githubusercontent.com/QuanTomiZaH/ShadowSocks-Install-script/master/multiple%20user%20no%20optim | bash
 
 #Update the machine just in case
 echo "Getting updates for this machine"
@@ -9,7 +11,6 @@ echo "checking if this machine requires python-pip "
 apt-get install python-pip <<-EOF
 y
 EOF
-pip install --upgrade pip
 
 echo "installing shadowsocks"
 pip install shadowsocks
@@ -26,15 +27,12 @@ ldconfig
 private_ip=$(ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')
 echo $private_ip
 
-#Deze cd weghalen wanneer hij in het echte script komt
-cd
-
 cd /etc
 echo "Creating Config file"
 #Een nieuw textbestand aanmaken voor de config van Shadowsocks
 config_file_shadowsocks="shadowsocks.json"
 if [ -e $config_file_shadowsocks ]; then
-	echo "file" + $config_file_shadowsocks + " already exists!"
+    echo "file" + $config_file_shadowsocks + " already exists!"
 else
 	#Text naar het textbestand schrijven | Hier de verschillende gegevens inzetten als die nodig zijn(poorten en wachtwoorden)
 	echo '{' >> $config_file_shadowsocks
@@ -45,7 +43,7 @@ else
 	echo '        "8383": "password3",' >> $config_file_shadowsocks
 	echo '        "8384": "password4",' >> $config_file_shadowsocks
 	echo '        "8385": "password5",' >> $config_file_shadowsocks
-	echo '        "8386": "password6",' >> $config_file_shadowsocks
+	echo '        "8386": "password6"' >> $config_file_shadowsocks
 	echo '    },' >> $config_file_shadowsocks
 	echo '     "local_port":1080,' >> $config_file_shadowsocks
 	echo '     "timeout":600,' >> $config_file_shadowsocks #Dit is 10 minuten geen reactie dan zet hij de verbinding uit
@@ -56,12 +54,11 @@ fi
 #give the file permission to be ran
 chmod u+x $config_file_shadowsocks
 
-#starting the shadowsocks server
-ssserver -c /etc/shadowsocks.json -d start
-
-#Adding to the config file so the server starts everytime after
 sed -i "14i /usr/bin/python /usr/local/bin/ssserver -c /etc/shadowsocks.json -d start" rc.local
-sed -i "13d" rc.local
+
+cd
+
+ssserver -c /etc/shadowsocks.json -d start
 
 #Navigate to the correct path
 cd /etc/security
