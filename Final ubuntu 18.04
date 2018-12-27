@@ -1,0 +1,132 @@
+#!/usr/bin/env bash
+#Disclaimer. This only works on a system close to fabrication settings regarding installs etc. Developed for ubuntu 16.04
+#Use PuTTy to connect to your server using SSH. After this, use the below command:
+#wget -O - https://raw.githubusercontent.com/jeroenabel/shadowsocks/master/Final-Ubuntu-18.04 | bash
+
+#Update the machine just in case
+echo "Getting updates for this machine"
+apt-get update
+
+#Install python.pip for Shadowsocks
+echo "checking if this machine requires python-pip "
+apt-get install python-pip <<-EOF
+y
+EOF
+
+echo "installing shadowsocks"
+pip install https://github.com/shadowsocks/shadowsocks/archive/master.zip -U #ShadowSocks v. 3.0.0
+
+#Installing cryptobox for security and speed
+apt-get install python-m2crypto <<-EOF
+Y
+EOF
+apt-get install build-essential
+wget https://github.com/jedisct1/libsodium/releases/download/1.0.16/libsodium-1.0.16.tar.gz
+tar xf libsodium-1.0.16.tar.gz && cd libsodium-1.0.16
+./configure && make && make install
+ldconfig
+
+#Define a variable to detect the private IP of this machine so it can be added to the config file
+private_ip=$(ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')
+echo $private_ip
+
+cd /etc
+echo "Creating Config file"
+#Create a new textfile for the config of Shadowsocks, edit the passwords manually
+#Edit the file with: nano -w etc/shadowsocks.json
+#Exit with ctrl+x and save the file
+config_file_shadowsocks="shadowsocks.json"
+if [ -e $config_file_shadowsocks ]; then
+    echo "file" + $config_file_shadowsocks + " already exists!"
+else
+	#Text naar het textbestand schrijven | Hier de verschillende gegevens inzetten als die nodig zijn(poorten en wachtwoorden)
+	echo '{' >> $config_file_shadowsocks
+	echo '     "server":"'$private_ip'",' >> $config_file_shadowsocks
+	echo '     "port_password": {' >> $config_file_shadowsocks #Port and password combination for different connections
+	echo '        "8001": "password1",' >> $config_file_shadowsocks 
+	echo '        "8002": "password2",' >> $config_file_shadowsocks
+	echo '        "8003": "password3",' >> $config_file_shadowsocks
+	echo '        "8004": "password4",' >> $config_file_shadowsocks
+	echo '        "8005": "password5",' >> $config_file_shadowsocks
+	echo '        "8006": "password6",' >> $config_file_shadowsocks
+	echo '        "8007": "password7",' >> $config_file_shadowsocks
+ 	echo '        "8008": "password8",' >> $config_file_shadowsocks 
+	echo '        "8009": "password9",' >> $config_file_shadowsocks
+	echo '        "8010": "password10",' >> $config_file_shadowsocks
+	echo '        "8011": "password11",' >> $config_file_shadowsocks
+ 	echo '        "8012": "password12",' >> $config_file_shadowsocks 
+	echo '        "8013": "password13",' >> $config_file_shadowsocks
+	echo '        "8014": "password14",' >> $config_file_shadowsocks
+	echo '        "8015": "password15",' >> $config_file_shadowsocks
+ 	echo '        "8016": "password16",' >> $config_file_shadowsocks   
+	echo '        "8017": "password17",' >> $config_file_shadowsocks
+	echo '        "8018": "password18",' >> $config_file_shadowsocks
+	echo '        "8019": "password19",' >> $config_file_shadowsocks
+	echo '        "8020": "password20"' >> $config_file_shadowsocks
+	echo '    },' >> $config_file_shadowsocks
+	echo '     "local_port":1080,' >> $config_file_shadowsocks
+	echo '     "timeout":600,' >> $config_file_shadowsocks #10 minutes no response --> timeout
+  	echo '     "fast_open": true,' >> $config_file_shadowsocks
+	echo '     "method":"aes-256-gcm"' >> $config_file_shadowsocks #AEAD cipher for increased security
+	echo '}' >> $config_file_shadowsocks
+fi
+
+#give the file permission to be ran
+chmod u+x $config_file_shadowsocks
+
+sed -i "14i /usr/bin/python /usr/local/bin/ssserver -c /etc/shadowsocks.json -d start" rc.local
+
+cd #probably redundant
+
+#Navigate to the correct path
+cd /etc/security
+
+echo '* soft nofile 51200' >> limits.conf
+echo '* hard nofile 51200' >> limits.conf
+
+ulimit -n 51200
+
+cd /etc
+
+chmod u+x sysctl.conf
+
+#Adding all the settings for the kernel to allow more connections and speed
+echo 'fs.file-max = 51200' >> sysctl.conf
+echo 'net.core.rmem_max = 67108864' >> sysctl.conf
+echo 'net.core.wmem_max = 67108864' >> sysctl.conf
+echo 'net.core.rmem_default = 65536' >> sysctl.conf
+echo 'net.core.wmem_default = 65536' >> sysctl.conf
+echo 'net.core.netdev_max_backlog = 250000' >> sysctl.conf
+echo 'net.core.somaxconn = 4096' >> sysctl.conf
+echo 'net.ipv4.tcp_syncookies = 1' >> sysctl.conf
+echo 'net.ipv4.tcp_tw_reuse = 1' >> sysctl.conf
+echo 'net.ipv4.tcp_tw_recycle = 0' >> sysctl.conf
+echo 'net.ipv4.tcp_fin_timeout = 30' >> sysctl.conf
+echo 'net.ipv4.tcp_keepalive_time = 1200' >> sysctl.conf
+echo 'net.ipv4.ip_local_port_range = 10000 65000' >> sysctl.conf
+echo 'net.ipv4.tcp_max_syn_backlog = 8192' >> sysctl.conf
+echo 'net.ipv4.tcp_max_tw_buckets = 5000' >> sysctl.conf
+echo 'net.ipv4.tcp_fastopen = 3' >> sysctl.conf
+echo 'net.ipv4.tcp_mem = 25600 51200 102400' >> sysctl.conf
+echo 'net.ipv4.tcp_rmem = 4096 87380 67108864' >> sysctl.conf
+echo 'net.ipv4.tcp_wmem = 4096 65536 67108864' >> sysctl.conf
+echo 'net.ipv4.tcp_mtu_probing = 1' >> sysctl.conf
+echo 'net.ipv4.tcp_congestion_control = cubic' >> sysctl.conf
+
+sysctl -p
+
+cd
+
+#Setting up firewall for increased security --> Make sure you allow the ports written in the ports/password combination!
+ufw default deny incoming
+ufw default allow outgoing
+ufw allow 22    #SSH
+ufw allow 8001:8020/tcp
+ufw allow 8001:8020/udp
+ufw enable <<-EOF
+y
+EOF
+
+ufw status verbose #Check to see if all rules have been correctly added
+
+ssserver -c /etc/shadowsocks.json -d start
