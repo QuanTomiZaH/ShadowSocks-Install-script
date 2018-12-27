@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
-#rin with:
-#wget -O - https://raw.githubusercontent.com/QuanTomiZaH/ShadowSocks-Install-script/master/Install%20w%20optimization | bash
+#Disclaimer. This only works on a system close to fabrication settings regarding installs etc. Developed for ubuntu 16.04
+#When ssh'd to your system. Use the below command:
+#wget -O - https://raw.githubusercontent.com/QuanTomiZaH/ShadowSocks-Install-script/master/20181227%20Complete | bash
 
 #Update the machine just in case
 echo "Getting updates for this machine"
@@ -23,13 +24,13 @@ tar xf libsodium-1.0.10.tar.gz && cd libsodium-1.0.10
 ./configure && make && make install
 ldconfig
 
-#Een variabele definiëren om de private IP te vinden, deze wordt in het config file.json toegevoegd zodat er verbinding kan worden gemaakt
+#Define a variable to detect the private IP of this machine so it can be added to the config file
 private_ip=$(ifconfig | grep 'inet addr:'| grep -v '127.0.0.1' | cut -d: -f2 | awk '{ print $1}')
 echo $private_ip
 
 cd /etc
 echo "Creating Config file"
-#Een nieuw textbestand aanmaken voor de config van Shadowsocks
+#Create a new textfile for the config of Shadowsocks(This is not a secure method for adding login credentials. Best option would be to create the file manually using VI or editing the login after creating with a text editor)
 config_file_shadowsocks="shadowsocks.json"
 if [ -e $config_file_shadowsocks ]; then
     echo "file" + $config_file_shadowsocks + " already exists!"
@@ -56,7 +57,7 @@ chmod u+x $config_file_shadowsocks
 
 sed -i "14i /usr/bin/python /usr/local/bin/ssserver -c /etc/shadowsocks.json -d start" rc.local
 
-cd
+cd#probably redundant
 
 #Navigate to the correct path
 cd /etc/security
@@ -70,6 +71,7 @@ cd /etc
 
 chmod u+x sysctl.conf
 
+#Adding all the settings for the kernel to allow more connections and speed
 echo 'fs.file-max = 51200' >> sysctl.conf
 echo 'net.core.rmem_max = 67108864' >> sysctl.conf
 echo 'net.core.wmem_max = 67108864' >> sysctl.conf
