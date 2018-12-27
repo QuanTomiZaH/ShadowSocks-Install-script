@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #Disclaimer. This only works on a system close to fabrication settings regarding installs etc. Developed for ubuntu 16.04
 #Use PuTTy to connect to your server using SSH. After this, use the below command:
-#wget -O - https://raw.githubusercontent.com/jeroenabel/shadowsocks/master/Final-Ubuntu-18.04 | bash
+#wget -O - https://raw.githubusercontent.com/QuanTomiZaH/ShadowSocks-Install-script/master/Final%20ubuntu%2018.04 | bash
 
 #Update the machine just in case
 echo "Getting updates for this machine"
